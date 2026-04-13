@@ -151,6 +151,13 @@ function ts_utils.listActiveDrivers()
             username = ternary(auth_enabled, ntop.getPref("ntopng.prefs.influx_username"), nil),
             password = ternary(auth_enabled, ntop.getPref("ntopng.prefs.influx_password"), nil)
         })
+        if isEmptyString(influxdb_driver.url) then
+            -- Redis not ready yet; don't cache this driver.
+            -- The fallback to RRD will handle this cycle,
+            -- and the next call will retry.
+            return {}
+        end
+
         active_drivers[#active_drivers + 1] = influxdb_driver
     end
 
